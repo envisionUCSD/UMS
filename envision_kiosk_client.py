@@ -896,6 +896,8 @@ class MainWindow(wx.Frame):
 			self.userIDnumber = idString
 			app.frame.ShowFullScreen(True)
 			app.frame.Show()
+			for i in xrange(app.frame.NUMPRINTERS):
+				app.frame.bitmap_buttons[i].Disable()
 			self.Hide()
 			app.frame.timer.inactiveCount = 0
 			app.frame.timer.Start(IDLETIME)
