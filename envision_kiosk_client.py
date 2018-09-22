@@ -1338,7 +1338,7 @@ class PrinterFrame(wx.Frame):
 		if BYPASS:
 			for i in xrange(NUMPRINTERS):
 				thisButton = self.bitmap_buttons[i]
-				if thisButton.status = "ENABLED":
+				if thisButton.status == "ENABLED":
 					thisButton.Enable()
 		app.frame.bitmap_buttons[-1].Disable()
 		app.signOnFrame.Show()
