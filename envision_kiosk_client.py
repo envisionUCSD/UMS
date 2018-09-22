@@ -899,6 +899,7 @@ class MainWindow(wx.Frame):
 			app.frame.Show()
 			for i in xrange(NUMPRINTERS):
 				app.frame.bitmap_buttons[i].Disable()
+			
 			app.frame.bitmap_buttons[-1].Enable()
 			self.Hide()
 			app.frame.timer.inactiveCount = 0
