@@ -15,7 +15,7 @@ else:
 	GTK = True
 	MSW = False
 
-VERSION = "396"
+VERSION = "397"
 """
 -286: updated popupFrame.onEnter to stop the idle timer. This isn't the correct solution but works for now
 	: need to have idleFrame.onExit clean up all of the modal dialogs before exiting.
