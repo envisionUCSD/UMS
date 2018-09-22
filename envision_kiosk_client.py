@@ -891,11 +891,15 @@ class MainWindow(wx.Frame):
 
 			self.userIDnumber = idString #set the current user to this ID string
 			self.socketWorker.sendEvent(["EVT_CHECKID",MACHINENAME,self.userIDnumber,"False"]) #check the ID record on the server
+		
 		elif (idInput.startswith('#') and idInput.endswith('#')):
 		#check once more if the string is correctly formatted
 			self.userIDnumber = idString
 			app.frame.ShowFullScreen(True)
 			app.frame.Show()
+			for i in xrange(NUMPRINTERS):
+				app.frame.bitmap_buttons[i].Disable()
+			app.frame.bitmap_buttons[-1].Enable()
 			self.Hide()
 			app.frame.timer.inactiveCount = 0
 			app.frame.timer.Start(IDLETIME)
