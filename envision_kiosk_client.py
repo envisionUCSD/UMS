@@ -839,16 +839,18 @@ class MainWindow(wx.Frame):
 			wx.MessageBox("Please Use The ID-Reader", "ERROR")
 			return
 		#ascii code 36 is $ and is the start and trail char of the magreader
-		elif keycode == 36:
+		#ascii code 35 is a hash (#) and indicates an admin card is being used
+		elif keycode == 36 or keycode == 35:
 			#if present, start accepting characters into the inputList
 			acceptString = True
 			inputList.append(keycode)
 			return
+		
 		#look for an enter key
 		if acceptString:
 			if keycode == wx.WXK_RETURN:
-				#if return is pressed, make sure the last character is $
-				if inputList[-1] == 36:
+				#if return is pressed, make sure the last character is $ (or a hash [#] for adminCard)
+				if inputList[-1] == 36 or inputList[-1] == 35:
 					#join the character together in a string
 					inputString = ''.join(chr(i) for i in inputList)
 					#wx.MessageBox("You Entered \n"+inputString, "ERROR")
@@ -872,7 +874,7 @@ class MainWindow(wx.Frame):
 	def idEnter(self, idInput):
 		idString = ""
 		if (idInput.startswith('$') and idInput.endswith('$')):
-		#check once more if the string is correclty formatted
+		#check once more if the string is correctly formatted
 			idChars = list(idInput)
 			if idChars[2] == '9':
 			#magstripe reads a '09' for students, replace this with a 'A' per UCSD standards
@@ -889,6 +891,15 @@ class MainWindow(wx.Frame):
 
 			self.userIDnumber = idString #set the current user to this ID string
 			self.socketWorker.sendEvent(["EVT_CHECKID",MACHINENAME,self.userIDnumber,"False"]) #check the ID record on the server
+		elif (idInput.startswith('#') and idInput.endswith('#')):
+		#check once more if the string is correctly formatted
+			self.userIDnumber = idString
+			app.frame.ShowFullScreen(True)
+			app.frame.Show()
+			self.Hide()
+			app.frame.timer.inactiveCount = 0
+			app.frame.timer.Start(IDLETIME)
+			app.frame.bitmap_buttons[-1].Enable()
 		else:
 			self.SetFocus()
 			return
