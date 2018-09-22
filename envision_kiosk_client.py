@@ -15,7 +15,7 @@ else:
 	GTK = True
 	MSW = False
 
-VERSION = "397"
+VERSION = "398"
 """
 -286: updated popupFrame.onEnter to stop the idle timer. This isn't the correct solution but works for now
 	: need to have idleFrame.onExit clean up all of the modal dialogs before exiting.
@@ -901,13 +901,11 @@ class MainWindow(wx.Frame):
 			app.frame.Show()
 			for i in xrange(NUMPRINTERS):
 				app.frame.bitmap_buttons[i].Disable()
-			
 			app.frame.bitmap_buttons[-1].Enable()
 			app.frame.cancelBtn.Disable()
 			self.Hide()
 			app.frame.timer.inactiveCount = 0
 			app.frame.timer.Start(IDLETIME)
-			app.frame.bitmap_buttons[-1].Enable()
 		else:
 			self.SetFocus()
 			return
@@ -1336,10 +1334,13 @@ class PrinterFrame(wx.Frame):
 		app.frame.timer.Stop()
 		app.signOnFrame.adminMode = False
 		if BYPASS:
+			print BYPASS
 			for i in xrange(NUMPRINTERS):
 				thisButton = app.frame.bitmap_buttons[i]
+				print thisButton.status
 				if thisButton.status == "ENABLED":
 					thisButton.Enable()
+			BYPASS = False
 		app.frame.bitmap_buttons[-1].Disable()
 		app.signOnFrame.Show()
 		app.signOnFrame.Raise()
