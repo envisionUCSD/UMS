@@ -40,7 +40,7 @@ inputList = []
 #standard UCSD id length, including leading and trailing '$' from mag-reader
 idLength = 11
 IDLETIME = 30000
-BYPASS = False
+
 
 PORTSAVAIL = list(serial.tools.list_ports.comports())
 for port in PORTSAVAIL:
@@ -610,6 +610,7 @@ class MainWindow(wx.Frame):
 		wx.Frame.__init__(self, parent, title = title, style=styleFlags)
 		self.adminMode = False
 		self.bi = None
+		self.BYPASS = False
 		#bind a close event to the function
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		#sizers for centering the static text 
@@ -896,7 +897,7 @@ class MainWindow(wx.Frame):
 		elif (idInput.startswith('#') and idInput.endswith('#')):
 		#check once more if the string is correctly formatted
 			self.userIDnumber = idString
-			BYPASS = True
+			self.BYPASS = True
 			app.frame.ShowFullScreen(True)
 			app.frame.Show()
 			for i in xrange(NUMPRINTERS):
@@ -1333,14 +1334,12 @@ class PrinterFrame(wx.Frame):
 	def closeAdmin(self,event):
 		app.frame.timer.Stop()
 		app.signOnFrame.adminMode = False
-		if BYPASS:
-			print BYPASS
+		if app.signOnFrame.BYPASS:
 			for i in xrange(NUMPRINTERS):
 				thisButton = app.frame.bitmap_buttons[i]
-				print thisButton.status
 				if thisButton.status == "ENABLED":
 					thisButton.Enable()
-			BYPASS = False
+			app.signOnFrame.BYPASS = False
 		app.frame.bitmap_buttons[-1].Disable()
 		app.signOnFrame.Show()
 		app.signOnFrame.Raise()
