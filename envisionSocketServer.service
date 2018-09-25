@@ -1,0 +1,11 @@
+[Unit]
+Description=EnVision-local Socket Service
+After=multi-user.target
+
+[Service]
+Type=idle
+PIDFile=/run/envisionSocketServer.pid
+ExecStart=/home/e4ms/job_tracking/envisionSocketServer.py  >> /home/e4ms/job_tracking/socketLog.txt 2>&1
+
+[Install]
+WantedBy=multi-user.target
