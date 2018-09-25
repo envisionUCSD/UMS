@@ -1,0 +1,8 @@
+{
+    "envision-user":   "YOUR-USER",
+	"envision-pass":   "YOUR-PASS", 
+	"makerspace-user": "YOUR KIOSK USER",
+    "makerspace-pass": "YOUR KIOSK PASS",
+	"db-user":         "OEC DB USER",
+	"db-pass":         "OEC DB PASS"
+}
