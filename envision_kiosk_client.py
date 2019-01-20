@@ -1843,10 +1843,12 @@ class PrinterFrame(wx.Frame):
 	def closeSocket(self):
 		try:
 			del self.busyMsg
-		except AttributeError:
+		except Exception as e:
+			print e
 			print "busy message didn't exist"
 	
 	def socketClosed(self, event, errorMsg):
+		self.closeSocket()
 		self.Show()
 		self.Raise()
 		errorMsg = str(errorMsg)
@@ -1854,7 +1856,7 @@ class PrinterFrame(wx.Frame):
 		result = errorDlg.ShowModal()
 		if result == wx.ID_OK:
 			errorDlg.Destroy()
-		# end of class MyFrame
+# end of class PrinterFrame
 class MyApp(wx.App):
 	def OnInit(self):
 		self.lockerNumber = socket.gethostname()[-1]
