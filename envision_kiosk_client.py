@@ -15,7 +15,7 @@ else:
 	GTK = True
 	MSW = False
 
-VERSION = "398"
+VERSION = "396"
 """
 -286: updated popupFrame.onEnter to stop the idle timer. This isn't the correct solution but works for now
 	: need to have idleFrame.onExit clean up all of the modal dialogs before exiting.
@@ -40,7 +40,6 @@ inputList = []
 #standard UCSD id length, including leading and trailing '$' from mag-reader
 idLength = 11
 IDLETIME = 30000
-
 
 PORTSAVAIL = list(serial.tools.list_ports.comports())
 for port in PORTSAVAIL:
@@ -610,7 +609,6 @@ class MainWindow(wx.Frame):
 		wx.Frame.__init__(self, parent, title = title, style=styleFlags)
 		self.adminMode = False
 		self.bi = None
-		self.BYPASS = False
 		#bind a close event to the function
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		#sizers for centering the static text 
@@ -841,18 +839,16 @@ class MainWindow(wx.Frame):
 			wx.MessageBox("Please Use The ID-Reader", "ERROR")
 			return
 		#ascii code 36 is $ and is the start and trail char of the magreader
-		#ascii code 35 is a hash (#) and indicates an admin card is being used
-		elif keycode == 36 or keycode == 35:
+		elif keycode == 36:
 			#if present, start accepting characters into the inputList
 			acceptString = True
 			inputList.append(keycode)
 			return
-		
 		#look for an enter key
 		if acceptString:
 			if keycode == wx.WXK_RETURN:
-				#if return is pressed, make sure the last character is $ (or a hash [#] for adminCard)
-				if inputList[-1] == 36 or inputList[-1] == 35:
+				#if return is pressed, make sure the last character is $
+				if inputList[-1] == 36:
 					#join the character together in a string
 					inputString = ''.join(chr(i) for i in inputList)
 					#wx.MessageBox("You Entered \n"+inputString, "ERROR")
@@ -876,7 +872,7 @@ class MainWindow(wx.Frame):
 	def idEnter(self, idInput):
 		idString = ""
 		if (idInput.startswith('$') and idInput.endswith('$')):
-		#check once more if the string is correctly formatted
+		#check once more if the string is correclty formatted
 			idChars = list(idInput)
 			if idChars[2] == '9':
 			#magstripe reads a '09' for students, replace this with a 'A' per UCSD standards
@@ -893,20 +889,6 @@ class MainWindow(wx.Frame):
 
 			self.userIDnumber = idString #set the current user to this ID string
 			self.socketWorker.sendEvent(["EVT_CHECKID",MACHINENAME,self.userIDnumber,"False"]) #check the ID record on the server
-		
-		elif (idInput.startswith('#') and idInput.endswith('#')):
-		#check once more if the string is correctly formatted
-			self.userIDnumber = idString
-			self.BYPASS = True
-			app.frame.ShowFullScreen(True)
-			app.frame.Show()
-			for i in xrange(NUMPRINTERS):
-				app.frame.bitmap_buttons[i].Disable()
-			app.frame.bitmap_buttons[-1].Enable()
-			app.frame.cancelBtn.Disable()
-			self.Hide()
-			app.frame.timer.inactiveCount = 0
-			app.frame.timer.Start(IDLETIME)
 		else:
 			self.SetFocus()
 			return
@@ -1334,12 +1316,6 @@ class PrinterFrame(wx.Frame):
 	def closeAdmin(self,event):
 		app.frame.timer.Stop()
 		app.signOnFrame.adminMode = False
-		if app.signOnFrame.BYPASS:
-			for i in xrange(NUMPRINTERS):
-				thisButton = app.frame.bitmap_buttons[i]
-				if thisButton.status == "ENABLED":
-					thisButton.Enable()
-			app.signOnFrame.BYPASS = False
 		app.frame.bitmap_buttons[-1].Disable()
 		app.signOnFrame.Show()
 		app.signOnFrame.Raise()
