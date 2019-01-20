@@ -15,7 +15,7 @@ else:
 	GTK = True
 	MSW = False
 
-VERSION = "396"
+VERSION = "400"
 MINIMUMFONTSIZE = 4
 NUMPRINTERS = 16
 #SERVERADDRESS = 'localhost'
@@ -1866,6 +1866,7 @@ class MyApp(wx.App):
 		self.grids = 4
 		self.printerFontSize = 14
 		self.buttonSize = 60
+		self.isInitialized = False
 		self.__set_bitmaps__()
 		self.signOnFrame = None
 		return True
