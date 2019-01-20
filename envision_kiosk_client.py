@@ -16,13 +16,6 @@ else:
 	MSW = False
 
 VERSION = "396"
-"""
--286: updated popupFrame.onEnter to stop the idle timer. This isn't the correct solution but works for now
-	: need to have idleFrame.onExit clean up all of the modal dialogs before exiting.
-
-
-
-"""
 MINIMUMFONTSIZE = 4
 NUMPRINTERS = 16
 #SERVERADDRESS = 'localhost'
@@ -545,19 +538,16 @@ class SocketThread(threading.Thread):
 		pass
 	#use this function to send message through the socket to the server. Function expects a packet length of 3
 	def sendEvent(self,eventPacket):
-		#display a waiting message....this needs to be moved into the gui with a callafter
+		#display a waiting message inside the GUI thread with callafter
 		wx.CallAfter(self.parent.contactServer)
-		wx.GetApp().ProcessPendingEvents()#,wx.EVT_CLOSE,msg)
-		#self.parent.contactServer()
-		# message = "Contacting Server..."
-		# busyMsg = PBI.PyBusyInfo(message, parent=None, title=" ")
-		# wx.Yield()
+		wx.GetApp().ProcessPendingEvents()
+		#I think this is actually pretty hacky
+		
 		# convert all messages to uppercase
 		packet = [x.upper() for x in eventPacket]
 		#form the list into a string delineated by a SPACE 
 		packetStr = ' '.join(packet)
 		try:
-
 			#connect to the server on the port specified
 			client = socket.create_connection((SERVERADDRESS, SERVERPORT))
 			#send the packet string
@@ -568,12 +558,8 @@ class SocketThread(threading.Thread):
 			wx.GetApp().ProcessPendingEvents()
 		except Exception, msg:
 			#call this function if the connection was a failure
-			#del busyMsg
-			#wx.CallAfter(self.parent.closeSocket)
-			#wx.GetApp().ProcessPendingEvents()			
 			wx.CallAfter(self.parent.socketClosed,wx.EVT_CLOSE,msg)
 		else:
-			#del busyMsg
 			if len(reply) == 3:
 			#make sure the reply packet is properly formed
 				if reply[0] == packet[0] and reply[1]:
@@ -982,10 +968,12 @@ class MainWindow(wx.Frame):
 	def closeSocket(self):
 		try:
 			del self.busyMsg
-		except AttributeError:
+		except Exception as e:
+			print e
 			print "busy message didn't exist"
 	
 	def socketClosed(self, event, errorMsg):
+		self.closeSocket()
 		errorMsg = str(errorMsg)
 		errorDlg = wx.MessageDialog(self, "Connection to SERVER failed!\n\n"+errorMsg+"\n\nPlease see an Administrator", "ERROR", wx.OK | wx.ICON_ERROR | wx.CENTER)
 		result = errorDlg.ShowModal()
@@ -1005,7 +993,7 @@ class PrinterFrame(wx.Frame):
 		self.btnPanel = wx.Panel(self,wx.ID_ANY)
 		self.inactiveCount = 0
 		self.activeInput = False
-		#bind a wxTimer to UpdateEvent, this timer deterimines if the windows is inactive
+		#bind a wxTimer to UpdateEvent, this timer determines if the windows is inactive
 		#it does this by checking if the popupFrame has focus for a set amount of time (it shouldn't if the user is using the system)
 		self.timer = wx.Timer(self)
 		self.Bind(wx.EVT_TIMER,self.UpdateEvent,self.timer)
