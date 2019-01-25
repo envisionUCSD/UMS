@@ -1756,10 +1756,12 @@ class PrinterFrame(wx.Frame):
 						else:
 							machine.Disable()
 							now = datetime.datetime.now()
+							print machineName,errorList[2], errorList[3]
 							startTime = datetime.datetime.strptime(errorList[2], '%Y%m%d-%H:%M:%S')
 							timeLeft = datetime.timedelta(seconds=int(errorList[3]))
 							if startTime + timeLeft > now:
 								machine.seconds2Expire = ((startTime + timeLeft)-now).seconds
+								print machine.seconds2Expire
 								machine.printerInfo.SetLabel(str(datetime.timedelta(seconds=self.bitmap_buttons[num].seconds2Expire)))
 								machine.expireTimer.start()
 						break
