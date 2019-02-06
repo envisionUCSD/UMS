@@ -5,7 +5,9 @@ After=multi-user.target
 [Service]
 Type=idle
 PIDFile=/run/envisionSocketServer.pid
-ExecStart=/home/e4ms/job_tracking/envisionSocketServer.py  >> /home/e4ms/job_tracking/socketLog.txt 2>&1
-
+ExecStart=/home/e4ms/job_tracking/UMS/envisionSocketServer.py  >> /home/e4ms/job_tracking/socketLog.txt 2>&1
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 [Install]
 WantedBy=multi-user.target

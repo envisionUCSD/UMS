@@ -85,8 +85,8 @@ class DatabaseHandler():
 		self.db = None
 		self.cur = None
 		self.username = 'reports'
-		self.password = 'envisionLogs'
-		self.host = "envision-local.dynamic.ucsd.edu"
+		self.password = 'thinkmakebreak'
+		self.host = "envision-local.ucsd.edu"
 		self.port = 3306
 		self.database = "envision_control"
 		self.parent = parent
