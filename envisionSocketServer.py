@@ -9,7 +9,7 @@ May 2016
 All Rights Reserved
 """
 
-version = "v226"
+version = "v227"
 """
 -- 223 added laptop kiosk functionalities
 --123 added printer kiosk functionalities
@@ -33,7 +33,7 @@ check file on laptop machine....added some functionality for checking both MS db
 """
 #import calls
 import SocketServer #ability to open a socket and listen
-import json, MySQLdb #use saved data 
+import csv, json, MySQLdb #use saved data 
 import os, sys #standard OS functions
 import threading, signal #thread spawning and killing
 import datetime, time #time functions and handling
@@ -71,7 +71,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 		self.incoming = (self.request.recv(1024)).split() #receive into a buffer
 		recvFrom = "received packet from: {}".format(self.client_address[0])
 		logger.info("%s",recvFrom)
-		self.process(self.incoming)
+		self.process(self.incoming,self.client_address[0])
 	
 	def CheckMachine(self, machine):
 		availableMachines = envisionSS.envisionDB.getMachines()
@@ -474,8 +474,26 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 			returnInfo.append(errorMsg)
 		return returnInfo
 	
+	
+	def updateClientDict(self,machine,clientIP):
+		clientDict[machine]=clientIP
+		logger.info("%s written to hosts file with IP %s",machine,clientIP)
+		hostsFile = "/etc/hosts"
+		if os.path.isfile(hostsFile):
+		#check that the password file exists
+			with open(hostsFile,'r') as writeFile:
+				ipWriter = csv.writer(writeFile,delimiter="\t")
+				for key,value in clientDict.items():
+					ipWriter.writeRow([value,key])
+			logger.info("hostFile saved successfully")
+		else:
+			try:
+				raise OSError ('\"HOSTFILE\" File is Corrupt or Missing')
+			except OSError as error:
+				logger.critical("hostFile does not exist %s", error)
+	
 	#process the packet from handle()
-	def process(self, packet):
+	def process(self, packet, clientIP):
 		#incoming packet structure: EVENT, MACHINE, USER, INFO
 		#reply packet structure: EVENT, OK/DENY, INFO
 		logger.info("Packet contains %s",packet)
@@ -483,6 +501,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 		machine = packet[1]
 		user = packet[2]
 		info = packet[3].split("|")
+		if machine in clientDict and clientIP == clientDict[clientIP]:
+			pass
+		else:
+			pass
+			#self.updateClientDict(machine,clientIP)
 		#envisionSS.connectDB("envision") #connect to the envision db
 		reply=[]
 		reply.append(command)#add the event to the reply
@@ -1148,6 +1171,11 @@ if __name__ == "__main__":
 	doneEvent = threading.Event()
 	signal.signal(signal.SIGTERM, terminate)
 	envisionSS=EnvisionServer()
+	clientDict = {}
+	with open("/etc/hosts") as hostsFile:
+		ipReader = csv.reader(hostsFile,delimiter='\t')
+		for hosts in hostsFile:
+			clientDict[hosts[1]]=hosts[0]
 	HOST, PORT = "192.168.111.111", 6969
 	#HOST, PORT = "192.168.111.111", 9000
 	SocketServer.TCPServer.allow_reuse_address = True #just in case the port wasn't closed properly...doesn't always work
