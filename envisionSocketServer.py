@@ -47,7 +47,7 @@ passFile = '/home/e4ms/job_tracking/passList.txt'
 relayOn = "1"
 relayOff = "0"
 logger = logging.getLogger("EnVision Logger")
-handler = logging.handlers.TimedRotatingFileHandler("/var/log/envision/socketServer.log",when='midnight',interval=1,backupCount=7)
+handler = logging.handlers.TimedRotatingFileHandler("/var/log/envision/socketServerTEST.log",when='midnight',interval=1,backupCount=7)
 formatter=logging.Formatter("%(levelname)s:%(asctime)s:%(threadName)s:%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -504,8 +504,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 		if machine in clientDict and clientIP == clientDict[clientIP]:
 			pass
 		else:
-			pass
-			#self.updateClientDict(machine,clientIP)
+			self.updateClientDict(machine,clientIP)
 		#envisionSS.connectDB("envision") #connect to the envision db
 		reply=[]
 		reply.append(command)#add the event to the reply
@@ -1149,7 +1148,7 @@ def closeUp(msg,event):
 #function to close the socket and terminate all active threads
 #threads terminate without turning off the relays
 	envisionSS.envisionDB.connectDB()
-	envisionSS.envisionDB.stopThreads() #stop the threads but keep the relays on
+	#envisionSS.envisionDB.stopThreads() #stop the threads but keep the relays on
 	envisionSS.envisionDB.closeDB()
 	server.shutdown()
 	
@@ -1174,10 +1173,11 @@ if __name__ == "__main__":
 	clientDict = {}
 	with open("/etc/hosts") as hostsFile:
 		ipReader = csv.reader(hostsFile,delimiter='\t')
-		for hosts in hostsFile:
+		for hosts in ipReader:
 			clientDict[hosts[1]]=hosts[0]
-	HOST, PORT = "192.168.111.111", 6969
-	#HOST, PORT = "192.168.111.111", 9000
+	print clientDict
+	#HOST, PORT = "192.168.111.111", 6969
+	HOST, PORT = "192.168.111.111", 9000
 	SocketServer.TCPServer.allow_reuse_address = True #just in case the port wasn't closed properly...doesn't always work
 	
 	#Threaded server
@@ -1192,7 +1192,7 @@ if __name__ == "__main__":
 	server.daemon = True
 	
 	envisionSS.envisionDB.connectDB()
-	envisionSS.envisionDB.restartThreads() #restart any threads that were shutdown on last termination
+	#envisionSS.envisionDB.restartThreads() #restart any threads that were shutdown on last termination
 	envisionSS.envisionDB.closeDB()
 	try:
 		server.serve_forever()
