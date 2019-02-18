@@ -19,7 +19,7 @@ import socket #communicate, via a socket, to external (or local!) server
 import wx.lib.agw.pybusyinfo as PBI
 
 #Version Tracking
-version = "v181"
+version = "v182"
 """
 ##TODO for 75:
 - add logger
@@ -712,7 +712,10 @@ class MainWindow(wx.Frame):
 				else:
 					self.machineStart("True",info)
 			else:
-				self.machineStart("False",info)
+				if not disabled:
+					self.machineStart("False",info)
+				else:
+					wx.MessageBox("!! MACHINE IN MAINTENANCE MODE !!", "ERROR")
 		
 		elif command == "EVT_ADD_TIME":
 		#add time events are called when a user adds time to a 3d print, or an admin adds additional time
@@ -975,7 +978,7 @@ class MainWindow(wx.Frame):
 					idString = idString + idChars[i]
 
 			self.userIDnumber = idString #set the current user to this ID string
-			print self.userIDnumber
+			#print self.userIDnumber
 			self.socketWorker.sendEvent(["EVT_CHECKID",machineName,self.userIDnumber,"False"]) #check the ID record on the server
 		else:
 			return

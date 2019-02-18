@@ -291,9 +291,9 @@ class SimplePopupFrame(wx.Frame):
 			machineName = machine.sizer.GetStaticBox().GetLabel()
 			if machineName == self.machine:
 				if app.frame.bitmap_buttons[machineNum].status == "ENABLED":
-					app.adminFrame.socketWorker.sendEvent(["EVT_STATUS",self.machine,app.signOnFrame.userIDnumber,"FALSE"])
+					app.adminFrame.socketWorker.sendEvent(["EVT_CHANGE_STATUS",self.machine,app.signOnFrame.userIDnumber,"FALSE"])
 				elif app.frame.bitmap_buttons[machineNum].status == "DISABLED":
-					app.adminFrame.socketWorker.sendEvent(["EVT_STATUS",self.machine,app.signOnFrame.userIDnumber,"TRUE"])
+					app.adminFrame.socketWorker.sendEvent(["EVT_CHANGE_STATUS",self.machine,app.signOnFrame.userIDnumber,"TRUE"])
 				break
 		self.onClose(wx.EVT_BUTTON)
 	def LockerOpen(self,event):
@@ -498,9 +498,9 @@ class popupFrame(wx.Frame):
 			machineName = machine.sizer.GetStaticBox().GetLabel()
 			if machineName == self.machine:
 				if app.frame.bitmap_buttons[machineNum].status == "ENABLED":
-					app.adminFrame.socketWorker.sendEvent(["EVT_STATUS",self.machine,app.signOnFrame.userIDnumber,"FALSE"])
+					app.adminFrame.socketWorker.sendEvent(["EVT_CHANGE_STATUS",self.machine,app.signOnFrame.userIDnumber,"FALSE"])
 				elif app.frame.bitmap_buttons[machineNum].status == "DISABLED":
-					app.adminFrame.socketWorker.sendEvent(["EVT_STATUS",self.machine,app.signOnFrame.userIDnumber,"TRUE"])
+					app.adminFrame.socketWorker.sendEvent(["EVT_CHANGE_STATUS",self.machine,app.signOnFrame.userIDnumber,"TRUE"])
 				break
 		self.onClose(wx.EVT_BUTTON)
 
@@ -1652,7 +1652,7 @@ class PrinterFrame(wx.Frame):
 			#Note: the updating is done in ResetMachine that is called after the thread ends
 			#wx.MessageBox("Print Has Been KILLED","SUCCESS")
 			message = "Print has been KILLED"
-		elif command == "EVT_STATUS":
+		elif command == "EVT_CHANGE_STATUS":
 		#change in and out of maintenance mode
 			for machineNum, machine in enumerate(app.frame.bitmap_buttons):
 				machineName = machine.sizer.GetStaticBox().GetLabel()
@@ -1764,7 +1764,7 @@ class PrinterFrame(wx.Frame):
 								machine.expireTimer.start()
 						break
 			return
-		elif command == "EVT_STATUS":
+		elif command == "EVT_CHANGE_STATUS":
 		#this shouldn't happen
 			errorMessage = "Unable to take machine offline\n\n This is safe to dismiss"		
 		elif command == "EVT_RELEASE":
